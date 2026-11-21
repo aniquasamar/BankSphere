@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/14</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/14</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
@@ -86,51 +86,51 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const express = require('express');
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">const express = require('express');
 const router = express.Router();
 const Transactions = require('../model/transaction.model');
 const controller = require('../controller/controller');
 const txController = require('../controller/transaction.controller');
 const { verifyToken, isAdminEmployee, isAdminEmployeeCustomer } = require('../middlewares/middleware');
+const { scopeTransactionQuery } = require('../middlewares/guards');
 &nbsp;
 // ---- Money movement: all balance logic lives on the server ----
 router.post('/deposit', verifyToken, isAdminEmployee, txController.deposit);
 router.post('/withdraw', verifyToken, isAdminEmployee, txController.withdraw);
 router.post('/transfer', verifyToken, isAdminEmployeeCustomer, txController.transfer);
 &nbsp;
-// ---- Read-only reporting (unchanged) ----
-router.get('/summary', verifyToken, isAdminEmployeeCustomer, <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt;
-<span class="cstat-no" title="statement not covered" >  controller.getTransactionSummary(req, res, Transactions)</span>
+// ---- Read-only reporting: scope comes from the JWT, never from the query string ----
+router.get('/summary', verifyToken, isAdminEmployeeCustomer, scopeTransactionQuery, (req, res) =&gt;
+  controller.getTransactionSummary(req, res, Transactions)
 );
-router.get('/pagination', verifyToken, isAdminEmployeeCustomer, <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt;
-<span class="cstat-no" title="statement not covered" >  controller.getPaginatedTransactions(req, res, Transactions)</span>
+router.get('/pagination', verifyToken, isAdminEmployeeCustomer, scopeTransactionQuery, (req, res) =&gt;
+  controller.getPaginatedTransactions(req, res, Transactions)
 );
 &nbsp;
-// The ledger is append-only: the old generic POST / PUT / DELETE / GET-all routes are
-// intentionally removed so a transaction can never be edited or deleted over the API.
+// The ledger is append-only: no generic POST / PUT / DELETE / GET-all routes.
 &nbsp;
 module.exports = router;</pre></td></tr></table></pre>
 
@@ -139,7 +139,7 @@ module.exports = router;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-11-20T14:27:39.004Z
+                at 2026-11-21T19:36:47.712Z
             </div>
         <script src="../prettify.js"></script>
         <script>

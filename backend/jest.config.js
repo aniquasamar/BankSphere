@@ -4,7 +4,9 @@ module.exports = {
   collectCoverageFrom: [
     'services/transaction.service.js',
     'controller/transaction.controller.js',
-    'routes/transaction.routes.js',
-    'middlewares/middleware.js',
+    'middlewares/*.js',
+    'config/security.js',
+    'routes/*.js',
+    'services/upload.service.js',
   ],
 };
