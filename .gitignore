@@ -2,11 +2,12 @@
 node_modules/
 
 # Environment variables
-# .env
+.env
+coverage/
 
 #dummy files
 frontend/components/Shared/dummy.txt
-backend/public
+backend/public/stylesheets
 
 # Build folders
 dist

@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "test": "jest --runInBand",
-    "test:coverage": "jest --runInBand --coverage"
+  "start": "node ./bin/www",
+  "test": "jest --runInBand",
+  "test:coverage": "jest --runInBand --coverage",
+  "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

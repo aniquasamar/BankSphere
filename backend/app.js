@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const mongoose = require('mongoose');
 const applySecurity = require('./config/security');
 
 const app = express();
@@ -28,6 +29,9 @@ app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.get('/health', (req, res) => { const up = mongoose.connection.readyState === 1; res.status(up ? 200 : 503).json({ status: up ? 'ok' : 'db-unavailable' }); });
 
 //route level middleware
 app.use('/api/verify-token', verifyRouter);
