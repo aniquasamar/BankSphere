@@ -1,12 +1,13 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 
+// Exported so CORS (config/security.js) and the token check share ONE allow-list.
 const allowedOrigins = [
     process.env.CLIENT_URL,
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175"
-];
+].filter(Boolean);
 
 const verifyToken = (req,res,next) => {
     try{
@@ -56,6 +57,7 @@ const isAdminEmployeeCustomer = (req, res, next) => {
 
 
 module.exports = {
+    allowedOrigins,
     verifyToken,
     isAdmin,
     isAdminEmployee,

@@ -29,14 +29,12 @@ const createData = async (req,res,schema) => {
         res.status(422).json({
         message : "Already exist!",
         success : false,
-        error
     })
     }
     else{
         res.status(500).json({
         message : "Internal server error",
         success : false,
-        error
     })
     }
   }
@@ -55,7 +53,6 @@ const updateData = async (req, res, schema) => {
   } catch (error) {
     return res.status(500).json({
       message: 'Internal server error',
-      error: error.message
     });
   }
 };
@@ -72,7 +69,6 @@ const deleteData = async (req, res, Schema) => {
   } catch (error) {
     return res.status(500).json({
       message: 'Internal server error',
-      error: error.message
     });
   }
 };

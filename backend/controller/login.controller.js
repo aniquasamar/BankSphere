@@ -76,7 +76,6 @@ const loginFunc = async (req, res, Schema) => {
     return res.status(500).json({
       message: 'Internal server error',
       isLogged: false,
-      error: error.message
     });
   }
 };
