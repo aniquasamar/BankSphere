@@ -35,7 +35,7 @@ jobs:
 
       # The tests start a throw-away in-memory MongoDB replica set; cache its binary.
       - name: Cache MongoDB binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .mongodb-binaries
           key: mongod-${{ runner.os }}-${{ hashFiles('backend/package-lock.json') }}
