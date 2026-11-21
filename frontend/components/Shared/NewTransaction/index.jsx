@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Card,
   Input,
@@ -23,6 +23,7 @@ const NewTransaction = () => {
   const [loading, setLoading] = useState(false);
   const [transactionForm] = Form.useForm();
   const [messageApi, context] = message.useMessage();
+  const idemKeyRef = useRef(crypto.randomUUID());
 
   // Read logged in employee / admin info from sessionStorage
   const userInfo = JSON.parse(sessionStorage.getItem('userInfo') || '{}');
@@ -61,70 +62,40 @@ const NewTransaction = () => {
     }
   };
 
-  // onFinish - create transaction and update customer final balance
-  const onFinish = async (values) => {
-    if (!customerData) {
-      messageApi.error('Please find and select an account first');
-      return;
-    }
+const onFinish = async (values) => {
+  if (!customerData) {
+    messageApi.error('Please find and select an account first');
+    return;
+  }
 
-    const currentBal = Number(customerData?.finalBalance || 0);
-    const transAmount = Number(values.amount);
+  try {
+    setLoading(true);
+    const httpReq = http(token);
 
-    // Check insufficient funds on debit
-    if (values.type === 'debit' && transAmount > currentBal) {
-      messageApi.error('Insufficient account balance!');
-      return;
-    }
-
-    // Calculate new balance
-    let updatedBalance = 0;
-    if (values.type === 'credit') {
-      updatedBalance = currentBal + transAmount;
-    } else if (values.type === 'debit') {
-      updatedBalance = currentBal - transAmount;
-    }
-
-    try {
-      setLoading(true);
-
-      const transactionPayload = {
-        accountNumber: Number(customerData?.accountNumber),
-        customerId: customerData?._id,
-        type: values.type,
-        amount: transAmount,
+    // The server decides the balance, branch and createdBy (from the JWT).
+    // The client only says WHAT it wants. Same key on retry => never posted twice.
+    const endpoint = values.type === 'credit' ? 'deposit' : 'withdraw';
+    await httpReq.post(
+      `/api/transactions/${endpoint}`,
+      {
+        accountNumber: Number(customerData.accountNumber),
+        amount: Number(values.amount),
         remark: values.remark,
-        currentBalance: currentBal,
-        finalBalance: updatedBalance,
-        branch: customerData?.branch,
-        createdBy: userInfo?.fullname || 'employee',
-      };
+      },
+      { headers: { 'Idempotency-Key': idemKeyRef.current } }
+    );
 
-      const httpReq = http(token);
-
-      // 1. Create transaction entry
-      await httpReq.post('/api/transactions', transactionPayload);
-
-      // 2. Update customer balance in customers collection
-      await httpReq.put(`/api/customers/${customerData._id}`, {
-        finalBalance: updatedBalance,
-      });
-
-      // Update local state customer balance
-      setCustomerData({
-        ...customerData,
-        finalBalance: updatedBalance,
-      });
-
-      messageApi.success('Transaction Created Successfully');
-      transactionForm.resetFields();
-      setCustomerData(null);
-    } catch (err) {
-      messageApi.error(err?.response?.data?.message || 'Transaction failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+    messageApi.success('Transaction Created Successfully');
+    transactionForm.resetFields();
+    setCustomerData(null);
+    idemKeyRef.current = crypto.randomUUID(); // new intent => new key
+  } catch (err) {
+    // Keep the SAME key after a failure so pressing "retry" is safe.
+    messageApi.error(err?.response?.data?.message || 'Transaction failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
