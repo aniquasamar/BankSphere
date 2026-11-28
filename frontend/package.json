@@ -22,7 +22,7 @@
     "react-router-dom": "^7.9.1",
     "sweetalert": "^2.1.2",
     "swr": "^2.3.6",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^4.3.5",
     "universal-cookie": "^8.1.2"
   },
   "devDependencies": {
